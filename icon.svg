@@ -1,0 +1,25 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Background circle - warm cream -->
+  <circle cx="256" cy="256" r="256" fill="#fdf6ee"/>
+  <!-- Soft inner circle for depth -->
+  <circle cx="256" cy="256" r="230" fill="#fff8f0"/>
+
+  <!-- Paw pad (main central pad) -->
+  <ellipse cx="256" cy="295" rx="72" ry="60" fill="#c17f5a"/>
+
+  <!-- Toe pads -->
+  <!-- Top left toe -->
+  <ellipse cx="178" cy="218" rx="36" ry="30" fill="#c17f5a"/>
+  <!-- Top center-left toe -->
+  <ellipse cx="228" cy="195" rx="32" ry="28" fill="#c17f5a"/>
+  <!-- Top center-right toe -->
+  <ellipse cx="284" cy="195" rx="32" ry="28" fill="#c17f5a"/>
+  <!-- Top right toe -->
+  <ellipse cx="334" cy="218" rx="36" ry="30" fill="#c17f5a"/>
+
+  <!-- Inner highlight on main pad -->
+  <ellipse cx="256" cy="295" rx="52" ry="42" fill="#d4956e" opacity="0.4"/>
+
+  <!-- Tiny heart on main pad -->
+  <path d="M256 278 C256 278 242 266 242 257 C242 251 248 246 256 253 C264 246 270 251 270 257 C270 266 256 278 256 278Z" fill="#fdf6ee" opacity="0.7"/>
+</svg>

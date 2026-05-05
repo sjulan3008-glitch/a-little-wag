@@ -1,0 +1,338 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Little Wag</title>
+
+<!-- PWA Meta Tags -->
+<meta name="theme-color" content="#c17f5a">
+<meta name="description" content="A warm daily English diary with gratitude tracking — private and offline-ready.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="A Little Wag">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="A Little Wag">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="./manifest.json">
+
+<!-- Apple Touch Icons -->
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="apple-touch-icon" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" sizes="512x512" href="./icon-512.png">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="./icon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap');
+  :root {
+    --cream:#fdf6ee; --warm-white:#fffdf8; --tan:#e8ddd0; --sienna:#c17f5a;
+    --sienna-dark:#9a6040; --sage:#7d9b7a; --sage-light:#b5cdb2; --ink:#3a2f27;
+    --ink-muted:#7a6a5d; --gold:#d4a853; --gold-light:#f0d89a;
+    --shadow:rgba(90,60,30,.12); --shadow-md:rgba(90,60,30,.20);
+    --radius:16px; --radius-sm:10px; --transition:.25s cubic-bezier(.4,0,.2,1);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Lato',sans-serif;background-color:var(--cream);color:var(--ink);min-height:100vh;
+    background-image:radial-gradient(ellipse at 20% 20%,rgba(193,127,90,.08) 0%,transparent 60%),
+    radial-gradient(ellipse at 80% 80%,rgba(125,155,122,.08) 0%,transparent 60%)}
+  body::before{content:'';position:fixed;inset:0;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+    pointer-events:none;z-index:0}
+  .wrapper{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:28px 20px 60px}
+  /* ── Animal deco floating elements ── */
+  .deco-cat{position:fixed;top:18px;right:24px;font-size:28px;z-index:2;animation:catBob 3s ease-in-out infinite;user-select:none;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(90,60,30,.18))}
+  .deco-dog{position:fixed;bottom:36px;right:20px;font-size:26px;z-index:2;animation:dogWag 2.5s ease-in-out infinite;user-select:none;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(90,60,30,.18))}
+  .deco-paw-tl{position:fixed;top:60px;left:16px;font-size:22px;z-index:2;opacity:.45;transform:rotate(-20deg);user-select:none;pointer-events:none}
+  .deco-paw-br{position:fixed;bottom:80px;left:14px;font-size:20px;z-index:2;opacity:.35;transform:rotate(15deg);user-select:none;pointer-events:none}
+  @keyframes catBob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-6px) rotate(3deg)}}
+  @keyframes dogWag{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+  /* ── Header ── */
+  .app-header{text-align:center;margin-bottom:32px;position:relative}
+  .app-logo{font-family:'Playfair Display',serif;font-size:clamp(28px,5vw,40px);font-weight:600;color:var(--ink);letter-spacing:-.5px;line-height:1.1}
+  .app-logo span{color:var(--sienna);font-style:italic}
+  .app-logo .logo-cat{font-style:normal;font-size:.8em;vertical-align:middle;margin-left:8px}
+  .app-tagline{font-size:13px;font-weight:300;color:var(--ink-muted);letter-spacing:2px;text-transform:uppercase;margin-top:6px}
+  .paw-divider{font-size:16px;letter-spacing:6px;opacity:.5;margin-top:8px;display:block}
+  .meta-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+    background:var(--warm-white);border:1px solid var(--tan);border-radius:var(--radius);
+    padding:14px 20px;margin-bottom:24px;box-shadow:0 2px 12px var(--shadow)}
+  .meta-date{font-family:'Playfair Display',serif;font-size:18px;color:var(--ink)}
+  .meta-date .weekday{font-size:12px;font-weight:700;color:var(--sienna);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:2px}
+  .weather-chip{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--gold-light),#fde9b2);
+    border-radius:50px;padding:7px 16px;font-size:13px;font-weight:700;color:var(--sienna-dark);
+    border:1px solid var(--gold);min-width:80px;justify-content:center}
+  .weather-chip .w-icon{font-size:18px}
+  .weather-chip.loading{opacity:.6;animation:pulse 1.5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.6}50%{opacity:.3}}
+  .card{background:var(--warm-white);border:1px solid var(--tan);border-radius:var(--radius);
+    padding:24px;margin-bottom:20px;box-shadow:0 2px 16px var(--shadow);transition:box-shadow var(--transition)}
+  .card:focus-within{box-shadow:0 4px 28px var(--shadow-md)}
+  .card-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--sienna);
+    text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .card-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--sienna);border-radius:2px}
+  .card-title .ct-icon{font-size:16px}
+  .diary-textarea{width:100%;min-height:260px;resize:vertical;border:none;outline:none;background:transparent;
+    font-family:'Lato',sans-serif;font-size:15.5px;line-height:1.85;color:var(--ink);letter-spacing:.15px}
+  .diary-textarea::placeholder{color:var(--ink-muted);opacity:.55;font-style:italic}
+  .word-count{text-align:right;font-size:11px;color:var(--ink-muted);margin-top:8px;font-weight:300;letter-spacing:.5px}
+  .diary-ruled{background-image:repeating-linear-gradient(to bottom,transparent 0px,transparent 28px,rgba(232,221,208,.55) 29px);background-attachment:local;padding-bottom:4px}
+  /* Gratitude */
+  .gratitude-list{display:flex;flex-direction:column;gap:10px}
+  .gratitude-item{display:flex;align-items:center;gap:12px}
+  .gratitude-num{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--sage),var(--sage-light));
+    color:white;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .gratitude-input{flex:1;border:none;border-bottom:1.5px solid var(--tan);outline:none;background:transparent;
+    font-family:'Lato',sans-serif;font-size:14.5px;color:var(--ink);padding:6px 4px;transition:border-color var(--transition)}
+  .gratitude-input::placeholder{color:var(--ink-muted);opacity:.5;font-style:italic}
+  .gratitude-input:focus{border-bottom-color:var(--sage)}
+  .gratitude-footer-paws{text-align:right;font-size:14px;opacity:.45;margin-top:10px;letter-spacing:4px}
+  /* Buttons */
+  .btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+  .btn{display:inline-flex;align-items:center;gap:7px;padding:11px 22px;border-radius:50px;border:none;cursor:pointer;
+    font-family:'Lato',sans-serif;font-size:13.5px;font-weight:700;letter-spacing:.3px;
+    transition:all var(--transition);text-decoration:none;white-space:nowrap}
+  .btn-primary{background:linear-gradient(135deg,var(--sienna),var(--sienna-dark));color:white;box-shadow:0 3px 12px rgba(154,96,64,.35)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(154,96,64,.45)}
+  .btn-secondary{background:var(--warm-white);color:var(--sienna-dark);border:1.5px solid var(--tan);box-shadow:0 2px 8px var(--shadow)}
+  .btn-secondary:hover{background:var(--cream);border-color:var(--sienna);transform:translateY(-1px)}
+  .btn-news{background:linear-gradient(135deg,#4a90d9,#2c6fad);color:white;box-shadow:0 3px 12px rgba(44,111,173,.30)}
+  .btn-news:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(44,111,173,.40)}
+  .btn:active{transform:translateY(0) scale(.98)}
+  /* History */
+  .history-panel{display:none}
+  .history-panel.open{display:block;animation:slideDown .3s cubic-bezier(.4,0,.2,1)}
+  @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+  .history-empty{color:var(--ink-muted);font-size:14px;font-style:italic;padding:12px 0;text-align:center}
+  .history-list{list-style:none;display:flex;flex-direction:column;gap:8px;max-height:380px;overflow-y:auto}
+  .history-list::-webkit-scrollbar{width:4px}
+  .history-list::-webkit-scrollbar-track{background:transparent}
+  .history-list::-webkit-scrollbar-thumb{background:var(--tan);border-radius:4px}
+  .history-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius-sm);
+    border:1px solid var(--tan);cursor:pointer;transition:all var(--transition);background:var(--cream)}
+  .history-item:hover{background:var(--warm-white);border-color:var(--sienna);box-shadow:0 2px 10px var(--shadow);transform:translateX(4px)}
+  .history-item-date{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--sienna);white-space:nowrap;min-width:90px}
+  .history-item-preview{font-size:13px;color:var(--ink-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+  .history-item-del{background:none;border:none;cursor:pointer;color:var(--ink-muted);font-size:16px;padding:2px 6px;border-radius:4px;transition:color var(--transition);flex-shrink:0}
+  .history-item-del:hover{color:#c0392b}
+  /* Modal */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(58,47,39,.55);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;padding:20px}
+  .modal-overlay.open{display:flex;animation:fadeIn .2s ease}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .modal{background:var(--warm-white);border-radius:var(--radius);max-width:680px;width:100%;max-height:85vh;overflow-y:auto;
+    box-shadow:0 20px 60px rgba(58,47,39,.30);animation:modalPop .3s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes modalPop{from{transform:scale(.92) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+  .modal-header{display:flex;align-items:flex-start;justify-content:space-between;padding:22px 24px 16px;border-bottom:1px solid var(--tan)}
+  .modal-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--ink)}
+  .modal-title .modal-date-label{font-size:11px;font-weight:700;color:var(--sienna);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:3px}
+  .modal-close{background:none;border:none;cursor:pointer;font-size:22px;color:var(--ink-muted);line-height:1;padding:2px 6px;border-radius:6px;transition:color var(--transition)}
+  .modal-close:hover{color:var(--ink)}
+  .modal-body{padding:20px 24px 24px}
+  .modal-section-label{font-size:11px;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;margin-top:18px}
+  .modal-diary-text{font-size:15px;line-height:1.8;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .modal-gratitude-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .modal-gratitude-list li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--ink);line-height:1.5}
+  .modal-gratitude-list li .gnum{width:22px;height:22px;border-radius:50%;background:var(--sage-light);color:white;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+  /* Toast */
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:var(--cream);padding:11px 24px;border-radius:50px;font-size:13.5px;font-weight:700;box-shadow:0 6px 24px rgba(0,0,0,.25);z-index:200;transition:transform .35s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .divider{border:none;border-top:1px solid var(--tan);margin:4px 0 14px}
+  .app-footer{text-align:center;font-size:11.5px;color:var(--ink-muted);font-weight:300;letter-spacing:.5px;margin-top:12px}
+  .new-entry-badge{display:inline-block;background:var(--gold-light);color:var(--sienna-dark);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:2px 8px;border-radius:50px;border:1px solid var(--gold);margin-left:8px;vertical-align:middle}
+  @media(max-width:540px){.meta-bar{flex-direction:column;align-items:flex-start}.btn-row{flex-direction:column}.btn{justify-content:center}.history-item-date{min-width:80px;font-size:12px}.deco-cat,.deco-dog,.deco-paw-tl,.deco-paw-br{display:none}}
+</style>
+</head>
+<body>
+<!-- Floating animal decorations -->
+<div class="deco-cat" aria-hidden="true">&#128049;</div>
+<div class="deco-dog" aria-hidden="true">&#128054;</div>
+<div class="deco-paw-tl" aria-hidden="true">&#128062;</div>
+<div class="deco-paw-br" aria-hidden="true">&#128062;</div>
+
+<div class="wrapper">
+  <header class="app-header">
+    <h1 class="app-logo">A Little <span>Wag</span> <span class="logo-cat">&#128008;</span></h1>
+    <p class="app-tagline">Write &bull; Reflect &bull; Grow</p>
+    <span class="paw-divider">&#128062; &#128062; &#128062;</span>
+  </header>
+  <div class="meta-bar">
+    <div class="meta-date">
+      <span class="weekday" id="weekday-label"></span>
+      <span id="date-label"></span>
+    </div>
+    <div class="weather-chip loading" id="weather-chip">
+      <span class="w-icon">&#9729;</span>
+      <span id="weather-text">Loading...</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="ct-icon">&#128049;</span> Today's Entry <span id="today-badge"></span></div>
+    <textarea id="diary-body" class="diary-textarea diary-ruled" placeholder="Dear Diary,&#10;&#10;Today was a day worth writing about..." spellcheck="true" lang="en"></textarea>
+    <div class="word-count"><span id="word-count">0</span> words</div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="ct-icon">&#128062;</span> Gratitude Points</div>
+    <div class="gratitude-list">
+      <div class="gratitude-item">
+        <div class="gratitude-num">1</div>
+        <input class="gratitude-input" id="g1" type="text" placeholder="I'm grateful for..." maxlength="200" />
+      </div>
+      <div class="gratitude-item">
+        <div class="gratitude-num">2</div>
+        <input class="gratitude-input" id="g2" type="text" placeholder="Something that made me smile..." maxlength="200" />
+      </div>
+      <div class="gratitude-item">
+        <div class="gratitude-num">3</div>
+        <input class="gratitude-input" id="g3" type="text" placeholder="A little thing I appreciated..." maxlength="200" />
+      </div>
+    </div>
+    <div class="gratitude-footer-paws">&#128062; &#128062; &#128062;</div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="save-btn">&#128054; Save Entry</button>
+    <button class="btn btn-secondary" id="toggle-history-btn">&#128209; Past Entries</button>
+    <a class="btn btn-news" href="https://news.google.com/?hl=en" target="_blank" rel="noopener">&#127758; English News</a>
+  </div>
+  <div class="card history-panel" id="history-panel">
+    <div class="card-title"><span class="ct-icon">&#128008;</span> Past Entries</div>
+    <hr class="divider">
+    <ul class="history-list" id="history-list">
+      <li class="history-empty">No saved entries yet.</li>
+    </ul>
+  </div>
+  <footer class="app-footer">&#128062; Entries saved locally in your browser &bull; Private &amp; offline-ready &#128062;</footer>
+</div>
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title">
+        <span class="modal-date-label" id="modal-date-label"></span>
+        <span id="modal-weekday"></span>
+      </div>
+      <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section-label">Diary Entry</div>
+      <div class="modal-diary-text" id="modal-diary-text"></div>
+      <div id="modal-gratitude-section">
+        <div class="modal-section-label">&#128062; Gratitude Points</div>
+        <ul class="modal-gratitude-list" id="modal-gratitude-list"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+  'use strict';
+  const STORAGE_KEY='english_diary_entries';
+  const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function getTodayKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+  function formatDatePretty(k){const[y,m,d]=k.split('-').map(Number);const dt=new Date(y,m-1,d);return MONTHS[dt.getMonth()]+' '+d+', '+y}
+  function formatWeekday(k){const[y,m,d]=k.split('-').map(Number);return DAYS[new Date(y,m-1,d).getDay()]}
+  (function renderDate(){const k=getTodayKey();document.getElementById('weekday-label').textContent=formatWeekday(k).toUpperCase();document.getElementById('date-label').textContent=formatDatePretty(k)})();
+  const WEATHER_CODES={113:'☀️',116:'⛅',119:'☁️',122:'☁️',143:'🌫️',176:'🌦️',179:'🌨️',182:'🌧️',185:'🌧️',200:'⛈️',227:'🌨️',230:'❄️',248:'🌫️',260:'🌫️',263:'🌦️',266:'🌧️',281:'🌧️',284:'🌧️',293:'🌦️',296:'🌧️',299:'🌧️',302:'🌧️',305:'🌧️',308:'🌧️',311:'🌧️',314:'🌧️',317:'🌧️',320:'🌨️',323:'🌨️',326:'🌨️',329:'❄️',332:'❄️',335:'❄️',338:'❄️',350:'🌧️',353:'🌦️',356:'🌧️',359:'🌧️',362:'🌧️',365:'🌧️',368:'🌨️',371:'❄️',374:'🌧️',377:'🌧️',386:'⛈️',389:'⛈️',392:'⛈️',395:'❄️'};
+  async function loadWeather(){
+    const chip=document.getElementById('weather-chip'),txt=document.getElementById('weather-text');
+    function applyWttr(json){
+      const cur=json.current_condition[0];
+      const icon=WEATHER_CODES[parseInt(cur.weatherCode,10)]||'🌡️';
+      chip.querySelector('.w-icon').textContent=icon;
+      txt.textContent='Busan '+cur.temp_C+'°C';
+    }
+    try{
+      const res=await fetch('https://wttr.in/Busan?format=j1',{signal:AbortSignal.timeout(6000)});
+      applyWttr(await res.json());
+    }catch{
+      try{
+        const res2=await fetch('https://corsproxy.io/?url='+encodeURIComponent('https://wttr.in/Busan?format=j1'),{signal:AbortSignal.timeout(8000)});
+        applyWttr(await res2.json());
+      }catch{txt.textContent='Unavailable'}
+    }
+    chip.classList.remove('loading');
+  }
+  loadWeather();
+  function loadEntries(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')}catch{return{}}}
+  function saveEntries(e){localStorage.setItem(STORAGE_KEY,JSON.stringify(e))}
+  const diaryTA=document.getElementById('diary-body'),wordCount=document.getElementById('word-count');
+  function updateWordCount(){wordCount.textContent=diaryTA.value.trim().split(/\s+/).filter(Boolean).length}
+  diaryTA.addEventListener('input',updateWordCount);
+  function loadTodayEntry(){
+    const entries=loadEntries(),k=getTodayKey(),badge=document.getElementById('today-badge');
+    if(entries[k]){const e=entries[k];diaryTA.value=e.body||'';document.getElementById('g1').value=e.g1||'';document.getElementById('g2').value=e.g2||'';document.getElementById('g3').value=e.g3||'';badge.innerHTML='<span class="new-entry-badge">Saved</span>'}
+    else badge.innerHTML='';
+    updateWordCount();
+  }
+  loadTodayEntry();
+  document.getElementById('save-btn').addEventListener('click',function(){
+    const k=getTodayKey(),entries=loadEntries();
+    entries[k]={body:diaryTA.value,g1:document.getElementById('g1').value,g2:document.getElementById('g2').value,g3:document.getElementById('g3').value,savedAt:new Date().toISOString()};
+    saveEntries(entries);
+    document.getElementById('today-badge').innerHTML='<span class="new-entry-badge">Saved</span>';
+    showToast('\uD83D\uDC3E Entry saved! \u2713');
+    renderHistory();
+  });
+  let toastTimer;
+  function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2400)}
+  const historyPanel=document.getElementById('history-panel'),toggleBtn=document.getElementById('toggle-history-btn');
+  toggleBtn.addEventListener('click',function(){
+    const open=historyPanel.classList.toggle('open');
+    toggleBtn.textContent=open?'\u2715 Close History':'\uD83D\uDCD3 Past Entries';
+    if(open){renderHistory();historyPanel.scrollIntoView({behavior:'smooth',block:'nearest'})}
+  });
+  function renderHistory(){
+    const entries=loadEntries(),ul=document.getElementById('history-list'),keys=Object.keys(entries).sort((a,b)=>b.localeCompare(a));
+    ul.innerHTML='';
+    if(keys.length===0){ul.innerHTML='<li class="history-empty">No saved entries yet.</li>';return}
+    keys.forEach(key=>{
+      const e=entries[key],preview=(e.body||'').replace(/\n/g,' ').trim().slice(0,60)||'(no text)',li=document.createElement('li');
+      li.className='history-item';
+      li.innerHTML='<div class="history-item-date">'+formatDatePretty(key)+'</div><div class="history-item-preview">'+escHtml(preview)+((e.body||'').length>60?'\u2026':'')+'</div><button class="history-item-del" data-key="'+escHtml(key)+'" title="Delete entry" aria-label="Delete">\uD83D\uDDD1</button>';
+      li.addEventListener('click',function(ev){if(ev.target.closest('.history-item-del'))return;openModal(key,e)});
+      li.querySelector('.history-item-del').addEventListener('click',function(ev){
+        ev.stopPropagation();
+        if(!confirm('Delete entry for '+formatDatePretty(key)+'?'))return;
+        const all=loadEntries();delete all[key];saveEntries(all);renderHistory();showToast('Entry deleted.');
+      });
+      ul.appendChild(li);
+    });
+  }
+  const overlay=document.getElementById('modal-overlay'),modalClose=document.getElementById('modal-close');
+  function openModal(key,entry){
+    document.getElementById('modal-date-label').textContent=formatWeekday(key).toUpperCase();
+    document.getElementById('modal-weekday').textContent=formatDatePretty(key);
+    document.getElementById('modal-diary-text').textContent=entry.body||'(no text written)';
+    const gs=document.getElementById('modal-gratitude-section'),gu=document.getElementById('modal-gratitude-list'),gv=[entry.g1,entry.g2,entry.g3].filter(Boolean);
+    if(gv.length===0)gs.style.display='none';
+    else{gs.style.display='';gu.innerHTML=gv.map((g,i)=>'<li><span class="gnum">'+(i+1)+'</span><span>'+escHtml(g)+'</span></li>').join('')}
+    overlay.classList.add('open');document.body.style.overflow='hidden';
+  }
+  function closeModal(){overlay.classList.remove('open');document.body.style.overflow=''}
+  modalClose.addEventListener('click',closeModal);
+  overlay.addEventListener('click',function(ev){if(ev.target===overlay)closeModal()});
+  document.addEventListener('keydown',function(ev){if(ev.key==='Escape')closeModal()});
+  function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+})();
+</script>
+
+<!-- PWA Service Worker Registration -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js')
+      .then(function(reg) {
+        console.log('[A Little Wag] Service Worker registered:', reg.scope);
+      })
+      .catch(function(err) {
+        console.warn('[A Little Wag] Service Worker registration failed:', err);
+      });
+  });
+}
+</script>
+</body>
+</html>
